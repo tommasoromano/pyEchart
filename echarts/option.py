@@ -15,13 +15,15 @@ from echarts.props import *
 #region BASE
 
 class Base(object):
-    def __init__(self, key, override_key=None, *args):
+    def __init__(self, key, override_key, *args):
         self.key = key
         if override_key != None:
             self.key = override_key
         self._jsn = dict()
         #self._jsn.update(kwargs)
+        print(args)
         for a in args:
+            print(a)
             if isinstance(a, Prop):
                 self._jsn[a.key] = a.value
             elif isinstance(a, Base):
@@ -44,6 +46,8 @@ class Title(Base):
     Title component, including main title and subtitle.
     There could be one or more than one title components. It is more useful when multiple diagrams in one instance all need titles.
 
+    https://echarts.apache.org/en/option.html#title
+
     - show: Show
     - text: Text
     - textStyle: TextStyle 
@@ -60,15 +64,16 @@ class Title(Base):
     TODO
     '''
     def __init__(self, *args):
-        super().__init__('title',*args)
-
+        super().__init__('title', None, *args)
 
 class Legend(Base):
     '''
     Legend component shows symbol, color and name of different series. 
     You can click legends to toggle displaying series in the chart.
+    
+    https://echarts.apache.org/en/option.html#legend
 
-    - type: plain, scroll
+    - type: LegendType
     - show: Show
     - left: Left
     - right: Right
@@ -76,22 +81,37 @@ class Legend(Base):
     - bottom: Bottom
     - width: Width
     - height: Height
-    - orient: horizontal, vertical
+    - orient: Orient
     - align: Align
-
 
     TODO
     '''
-    def __init__(self, type='plain', *args):
-        args = Prop('type',type) + args
-        super().__init__(*args)
+    def __init__(self, *args):
+        super().__init__('legend', None, *args)
 
 class Grid(Base):
     '''
+    Drawing grid in rectangular coordinate. 
+    In a single grid, at most two X and Y axes each is allowed. 
+    Line chart, bar chart, and scatter chart (bubble chart) can be drawn in grid.
+    In ECharts 2.x, there could only be one single grid component 
+    at most in a single echarts instance. 
+    But in ECharts 3, there is no limitation.
+
+    **Make sure the ars**
+
+    - show: Show
+    - left: Left ('10%')
+    - top: Top (60)
+    - right: Right ('10%')
+    - bottom: Bottom (60)
+    - width: Width ('auto')
+    - height: Height ('auto')
+
     TODO
     '''
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args):
+        super().__init__('grid', None, *args)
 
 class Axis(Base):
     '''
@@ -111,102 +131,6 @@ class Axis(Base):
     def __init__(self, key, override_key=None, *args):
         super().__init__(key, *args)
 
-
-class Tooltip(Base):
-    """A tooltip when hovering."""
-
-    def __init__(self, trigger='axis', **kwargs):
-        assert trigger in ('axis', 'item')
-        self.trigger = trigger
-
-        self._kwargs = kwargs
-
-    @property
-    def json(self):
-        """JSON format data."""
-        json = {
-            'trigger': self.trigger,
-        }
-        if self._kwargs:
-            json.update(self._kwargs)
-        return json
-
-
-class Series(Base):
-    """ Data series holding. """
-    def __init__(self, type, name=None, data=None, **kwargs):
-        types = (
-            'bar', 'boxplot', 'candlestick', 'chord', 'effectScatter',
-            'eventRiver', 'force', 'funnel', 'gauge', 'graph', 'heatmap',
-            'k', 'line', 'lines', 'map', 'parallel', 'pie', 'radar',
-            'sankey', 'scatter', 'tree', 'treemap', 'venn', 'wordCloud'
-        )
-        assert type in types
-        self.type = type
-        self.name = name
-        self.data = data or []
-        self._kwargs = kwargs
-
-    @property
-    def json(self):
-        """JSON format data."""
-        json = {
-            'type': self.type,
-            'data': self.data
-        }
-        if self.name:
-            json['name'] = self.name
-        if self._kwargs:
-            json.update(self._kwargs)
-        return json
-
-
-class Toolbox(Base):
-    """ A toolbox for visitor. """
-
-    def __init__(self, orient='horizontal', position=None, **kwargs):
-        assert orient in ('horizontal', 'vertical')
-        self.orient = orient
-        if not position:
-            position = ('right', 'top')
-        self.position = position
-        self._kwargs = kwargs
-
-    @property
-    def json(self):
-        """JSON format data."""
-        json = {
-            'orient': self.orient,
-            'x': self.position[0],
-            'y': self.position[1]
-        }
-        if self._kwargs:
-            json.update(self._kwargs)
-        return json
-
-    
-class VisualMap(Base):
-    """maps data to visual channels"""
-
-    def __init__(self, type, min, max,  **kwargs):
-        assert type in ("continuous", "piecewise")
-        self.type = type
-        self.min = min
-        self.max = max
-        self._kwargs = kwargs
-
-    @property
-    def json(self):
-        """JSON format data"""
-        json = {
-            "type": self.type,
-            'min': self.min,
-            'max': self.max
-        }
-        if self._kwargs:
-            json.update(self._kwargs)
-        return json
-
 #endregion
 ################################
 #   BASE_SECONDARY
@@ -222,10 +146,11 @@ class TextStyle(Base):
     - fontSize: FontSize
     - lineHeight: LineHeight
 
+    DONE
     TODO
     '''
-    def __init__(self, override_key=None, *args):
-        super().__init__('textStyle', override_key=override_key, *args)
+    def __init__(self, override_key, *args):
+        super().__init__('textStyle', override_key, *args)
 
 class SubTextStyle(TextStyle):
     '''
@@ -236,10 +161,11 @@ class SubTextStyle(TextStyle):
     - fontSize: FontSize
     - lineHeight: LineHeight
 
+    DONE
     TODO
     '''
     def __init__(self, *args):
-        super().__init__(override_key='subTextStyle', *args)
+        super().__init__('subTextStyle', *args)
 
 class Label(Base):
     '''
@@ -250,19 +176,19 @@ class Label(Base):
     TODO
     '''
     def __init__(self, *args):
-        super().__init__(*args)
+        super().__init__('label',None,*args)
 
 class LineStyle(Base):
     '''
-    - type: solid, dashed, dotted
+    - type: LineStyleType
     - color: Color
     - width: Width
     - opacity: Opacity
 
     TODO
     '''
-    def __init__(self, type='solid', *args):
-        args = Prop('type',type) + args
-        super().__init__(*args)
+    def __init__(self, *args):
+        print(args)
+        super().__init__('lineStyle', None, *args)
 
 #endregion

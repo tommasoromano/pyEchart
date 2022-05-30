@@ -14,13 +14,24 @@ class Prop(object):
         self.value = value
 
 class Type(Prop):
-    '''
-    Different from option to option
-    - Legend: plain, scroll
-    - LineStyle: solid, dashed, dotted
-    '''
     def __init__(self, value):
         super().__init__('type', value)
+
+class LineStyleType(Prop):
+    '''
+    - type: solid, dashed, dotted
+    '''
+    def __init__(self, value):
+        assert value not in ['solid, dashed, dotted']
+        super().__init__('type', value)
+
+class LegendType(Prop):
+    '''
+    - type: plain, scroll
+    '''
+    def __init__(self, value):
+        assert value not in ['plain, scroll']
+        super().__init__('type',value)
 
 class Show(Prop):
     '''
@@ -50,6 +61,7 @@ class Align(Prop):
     - string: auto, left, right, center
     '''
     def __init__(self, value, override_key=None):
+        assert value not in ['auto','left','right','center']
         super().__init__('align', value, override_key=override_key)
 
 class TextAlign(Align):
@@ -64,6 +76,7 @@ class VerticalAlign(Prop):
     - string: auto, top, bottom, middle
     '''
     def __init__(self, value, override_key=None):
+        assert value not in ['auto','top','bottom','middle']
         super().__init__('verticalAlign', value, override_key=override_key)
 
 class TextVerticalAlign(VerticalAlign):
@@ -141,6 +154,7 @@ class Orient(Prop):
     - string: horizontal, vertical
     '''
     def __init__(self, value):
+        assert value not in ['horizontal','vertical']
         super().__init__('orient',value)
 
 class Color(Prop):
@@ -155,6 +169,7 @@ class Opacity(Prop):
     - number: [0, 1]
     '''
     def __init__(self, value):
+        assert value > 1.0 or value < 0.0
         super().__init__('opacity', value)
 
 class FontStyle(Prop):
@@ -162,6 +177,7 @@ class FontStyle(Prop):
     - string: normal, italic, oblique
     '''
     def __init__(self, value):
+        assert value not in ['normal','italic','oblique']
         super().__init__('fontStyle', value)
 
 class FontWeight(Prop):
@@ -170,6 +186,8 @@ class FontWeight(Prop):
     - number: 100, 200, 300, 400...
     '''
     def __init__(self, value):
+        if value is str:
+            assert value not in ['normal','bold','bolder', 'lighter']
         super().__init__('fontWeight', value)
 
 class FontFamily(Prop):
@@ -177,6 +195,7 @@ class FontFamily(Prop):
     - string: sans-serif, serif, monospace, ...
     '''
     def __init__(self, value):
+        assert value not in ['sans-serif','serif','monospace']
         super().__init__('fontFamily', value)
 
 class FontSize(Prop):
